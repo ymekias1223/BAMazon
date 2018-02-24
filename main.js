@@ -33,7 +33,7 @@ connection.connect(function(err){
 	console.log("_________connect to bamazon________");
 	inquirer.prompt({
 		name:'account_type',
-		type:'rawlist'
+		type:'rawlist',
 		message:'who are you?',
 		choices: ['customer','manager','sysadminAKAtheImmortal']
 	}).then(function(response){
@@ -54,7 +54,7 @@ connection.connect(function(err){
 
 function editTable(name, department, price, quantity){
 	connection.query("INSERT INTO products (name,department,price,quantity) "
-		+"VALUES ('"+name+"','"+department+"',"+price+','+quantity")");
+		+"VALUES ('"+name+"','"+department+"','"+price+"','"+quantity+"')");
 }
 
 function seeAll(){
@@ -103,7 +103,14 @@ function editItem(id,quantity_to_add){
 
 
 function viewLowInv(){
-	query.connection(etc..)
+	var query = "GROUP BY quantity WHERE quantity<0";
+	connection.query(query,function(err,response){
+		if (err){
+			console.log(err);
+		}
+		console.log(response);
+		
+	})
 }
 
 
@@ -122,7 +129,7 @@ function regularUser(){
 	      message: "What is the name of the item you wish to purchase?"
 	    },
 	    {
-	    	name:"quantity";
+	    	name:"quantity",
 	    	type: "input",
 	    	message: "How many?(number character only)"
 	    })
@@ -153,7 +160,7 @@ function manager(){
 	inquirer.prompt({
 		name:'task',
 		type:'rawlist',
-		message:"I'm busy remembering databse stuff. What do you need?"
+		message:"I'm busy remembering databse stuff. What do you need?",
 		choices:["View all products","View low inventory", "Add to inventory","Add a new product","exit"]
 	}).then(function(response){
 		switch (response.task){
