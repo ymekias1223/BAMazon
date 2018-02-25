@@ -1,22 +1,9 @@
-// think about where you want to put your connection termination statement.  
-// dont forget this because if not present may throw program into an 
-// infinite loop
-
-//  next time: create the manager and sys admin functions.  Some manager funtions already defined.  
-//maybe require a password for sysadmin
 
 
 var mysql = require("mysql");
 var inquirer = require("inquirer");
 
 var userName;
-inquirer.prompt({
-	name: "username",
-	type:"input",
-	message:"Goodai mate!! Whots yoor nayme?"
-}).then(function(answer){
-	userName = answer.username;
-});
 
 var connection = mysql.createConnection({
 	host: "localhost",
@@ -25,31 +12,6 @@ var connection = mysql.createConnection({
 	user:'root',
 	password:'root',
 	database: 'bamazon'
-});
-
-connection.connect(function(err){
-	if (err) console.log(err);
-
-	console.log("_________connect to bamazon________");
-	inquirer.prompt({
-		name:'account_type',
-		type:'rawlist',
-		message:'who are you?',
-		choices: ['customer','manager','sysadminAKAtheImmortal']
-	}).then(function(response){
-		switch (response.account_type){
-			case 'customer':
-				regularUser();
-				break;
-			case 'manager':
-				manager();
-				break;
-			case 'sysadminAKAtheImmortal':
-				sysAdmin();
-				break;
-		}
-	});
-	
 });
 
 function editTable(name, department, price, quantity){
@@ -120,6 +82,7 @@ function terminateConnection(){
 }
 
 function regularUser(){
+	console.log("connected");
 	seeAll();
 
 	function untilShoppingOver(){
@@ -134,11 +97,11 @@ function regularUser(){
 	    	message: "How many?(number character only)"
 	    })
 	    .then(function(answer) {
-	      buyItem(answer.item_name,answer.quantity)
+	      buyItem(answer.item_name,answer.quantity);
 	      console.log("The item has been bought!!");
 	      inquirer.prompt({
 	      name: "continue",
-	      type: "rawlist",
+	      type: "list",
 	      message: "Would you like to keep shopping, "+userName+" ?",
 	      choices:["yes","no, im broke"]
 	    }).then(function(answer){
@@ -153,7 +116,7 @@ function regularUser(){
 
 		});
 	}
-
+	untilShoppingOver();
 }
 function manager(){
 	console.log("well, lookes like your still at work, "+ userName+". You hate your life dont you? :)")
@@ -185,3 +148,44 @@ function manager(){
 		}
 	})
 }
+
+connection.connect(function(err){
+	if (err) console.log(err);
+	inquirer.prompt({
+		name:'account_type',
+		type:'list',
+		message:'who are you?',
+		choices: ['customer','manager','sysadminAKAtheImmortal']
+	}).then(function(response){
+		
+		inquirer.prompt({
+		name:"username",
+		type:"input",
+		message:"whats your name?"
+		}).then(function(answer){
+		userName = answer.username;
+		});
+		
+		console.log(response);
+		switch (response.account_type){
+			case 'customer':
+				regularUser();
+				break;
+			case 'manager':
+				manager();
+				break;
+			case 'sysadminAKAtheImmortal':
+				sysAdmin();
+				break;
+		}
+		//inquirer.prompt({
+		//name: "username",
+		//type:"input",
+		//message:"Whats your name?"
+		//}).then(function(answer){
+		//userName = answer.username;
+		//});
+
+	});
+	
+});
